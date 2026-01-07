@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom animations and styles */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .scroll-animation {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        
+        .scroll-animation.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.3s, border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #181818;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #303030;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #404040;
+        }
+        
+        /* Card hover effects */
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Button press effect */
+        .btn-press:active {
+            transform: scale(0.97);
+        }
+        
+        /* MODAL SYSTEM STYLES (From your existing code - Updated for YouTube theme) */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+        
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: #fff;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .modal-nav:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .modal-nav.prev {
+            left: 20px;
+        }
+        
+        .modal-nav.next {
+            right: 20px;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 0, 0, 0.9);
+            color: #fff;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: scale(1.1);
+        }
+        
+        /* Image counter */
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(24, 24, 24, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Gallery image hover effect */
+        .gallery-item {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.03);
+        }
+        
+        .gallery-item img {
+            transition: transform 0.5s ease;
+        }
+        
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Certificate image fix */
+        .certificate-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        
+        /* Skill badge glow effect */
+        .skill-badge:hover {
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-[#0F0F0F] text-white">
+    <!-- Mobile Menu Toggle (hidden on desktop) -->
+    <div class="lg:hidden fixed top-0 left-0 right-0 z-50 bg-[#181818] p-4 flex justify-between items-center border-b border-[#303030]">
+        <div class="text-xl font-bold">Portfolio</div>
+        <button id="mobileMenuToggle" class="text-white focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Side Navigation -->
+    <nav id="sideNav" class="fixed left-0 top-0 h-full w-64 bg-[#181818] border-r border-[#303030] z-40 transform -translate-x-full lg:translate-x-0 lg:block transition-transform duration-300">
+        <div class="p-6">
+            <h2 class="text-xl font-bold mb-8">Navigation</h2>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#hero" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-home mr-3 text-[#AAAAAA]"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#about" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-user mr-3 text-[#AAAAAA]"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#skills" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-code mr-3 text-[#AAAAAA]"></i>
+                        <span>Skills</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#certificates" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-certificate mr-3 text-[#AAAAAA]"></i>
+                        <span>Certificates</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#projects" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-briefcase mr-3 text-[#AAAAAA]"></i>
+                        <span>Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#contact" class="nav-item flex items-center p-3 rounded-lg hover:bg-[#252525]">
+                        <i class="fas fa-envelope mr-3 text-[#AAAAAA]"></i>
+                        <span>Contact</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- IMAGE VIEWER MODAL (Same as your previous portfolio) -->
+    <div id="imageModal" class="modal">
+        <button class="modal-close">&times;</button>
+        
+        <button class="modal-nav prev">‹</button>
+        <button class="modal-nav next">›</button>
+        
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="Viewer image">
+            <div id="imageCounter" class="image-counter">1 / 1</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64">
+        <!-- Hero Section -->
+        <section id="hero" class="min-h-screen flex items-center p-6 lg:p-12 animate-fade-in-up">
+            <div class="max-w-7xl mx-auto w-full">
+                <div class="flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16">
+                    <!-- LEFT: Profile Image -->
+                    <div class="w-64 h-64 lg:w-80 lg:h-80 flex-shrink-0">
+                        <div class="w-full h-full overflow-hidden rounded-xl border-2 border-[#303030] bg-[#181818] p-2">
+                            <!-- Replace with your profile image -->
+                            <div class="w-full h-full bg-gradient-to-br from-[#303030] to-[#0F0F0F] flex items-center justify-center">
+                                <img src="images/aa.png" alt="Profile" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- RIGHT: Name, Role & Info -->
+                    <div class="flex-1">
+                        <h1 class="text-4xl lg:text-5xl font-bold mb-4">Christian Dave Reyes</h1>
+                        <div class="text-xl lg:text-2xl text-[#FF0000] font-medium mb-6">Web Developer</div>
+                        
+                        <p class="text-[#AAAAAA] text-lg mb-8 max-w-2xl">
+                            Passionate about creating beautiful, functional web experiences. 
+                            I specialize in modern frontend technologies and user-centered design.
+                        </p>
+                        
+                        <div class="flex flex-wrap gap-4 mb-10">
+                            <a href="#" download="christian-dave-reyes-cv" class="btn-press bg-[#FF0000] hover:bg-[#CC0000] text-white font-medium py-3 px-6 rounded-lg inline-flex items-center">
+                                <i class="fas fa-download mr-2"></i>
+                                Download CV
+                            </a>
+                            
+                            <div class="flex items-center space-x-4">
+                                <a href="https://github.com/CdReyes460" class="text-[#AAAAAA] hover:text-white text-2xl">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="https://www.linkedin.com/in/christian-dave-reyes-416a4a398/" class="text-[#AAAAAA] hover:text-white text-2xl">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="mailto:creyes@gmail.com" class="text-[#AAAAAA] hover:text-white text-2xl">
+                                    <i class="fas fa-envelope"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-[#303030] pt-6">
+                            <h3 class="text-xl font-medium mb-2">Currently</h3>
+                            <p class="text-[#AAAAAA]">Open to new opportunities and freelance projects</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-12 lg:py-20 px-6 lg:px-12 bg-[#181818] scroll-animation">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold mb-10">About Me</h2>
+                
+                <!-- Top Row: Education & Experience -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Education Card -->
+                    <div class="bg-[#0F0F0F] border border-[#303030] rounded-xl p-6 card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                <i class="fas fa-graduation-cap text-[#FF0000] text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium">Education</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="border-l-2 border-[#303030] pl-4">
+                                <h4 class="font-medium">Bachelor of Science in Information Technology</h4>
+                                <p class="text-[#AAAAAA] text-sm">Filamer Christian University</p>
+                                <p>2023 - Present</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Card -->
+                    <div class="bg-[#0F0F0F] border border-[#303030] rounded-xl p-6 card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                <i class="fas fa-briefcase text-[#FF0000] text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium">Experience</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="border-l-2 border-[#303030] pl-4">
+                                <h4 class="font-medium">Web Developer</h4>
+                                <p class="text-[#AAAAAA] text-sm">Filamer Christian University</p><p>June 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Row: About Card -->
+                <div class="bg-[#0F0F0F] border border-[#303030] rounded-xl p-6 card-hover">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                            <i class="fas fa-info-circle text-[#FF0000] text-xl"></i>
+                        </div>
+                        <h3 class="text-xl font-medium">Introduction</h3>
+                    </div>
+                    <div class="space-y-4 text-[#AAAAAA]">
+                        <p>My name is Christian Dave Reyes, and I am a web developer who enjoys building simple and functional websites. I like creating clean layouts that are easy to understand and work well on different devices. My goal is to build websites that are clear, useful, and easy for users to navigate.</p>
+                        <p>
+
+I focus on learning the basics of web development, including HTML, CSS, and JavaScript. I enjoy turning ideas into small projects and improving my skills step by step. I am always eager to learn new tools and grow as a web developer.</p>
+                        <div class="pt-4 border-t border-[#303030]">
+                            <h4 class="font-medium text-white mb-2">Core Values</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-[#181818] px-3 py-1 rounded text-sm">Clean Code</span>
+                                <span class="bg-[#181818] px-3 py-1 rounded text-sm">User-First Design</span>
+                                <span class="bg-[#181818] px-3 py-1 rounded text-sm">Continuous Learning</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-12 lg:py-20 px-6 lg:px-12 scroll-animation">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold mb-10">Skills & Technologies</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Front-end Card -->
+                    <div class="bg-[#181818] border border-[#303030] rounded-xl p-6 card-hover">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                <i class="fas fa-palette text-[#FF0000] text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium">Front-end</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">HTML</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">CSS</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">JavaScript</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">Tailwind CSS</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Back-end Card -->
+                    <div class="bg-[#181818] border border-[#303030] rounded-xl p-6 card-hover">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                <i class="fas fa-server text-[#FF0000] text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium">Back-end</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">Python</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">Java</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">JavaScript</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">PHP</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">Laravel</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">MySQL</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tools Card -->
+                    <div class="bg-[#181818] border border-[#303030] rounded-xl p-6 card-hover">
+                        <div class="flex items-center mb-6">
+                            <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                <i class="fas fa-tools text-[#FF0000] text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium">Tools</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">VS Code</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">XAMPP</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">Git</span>
+                            <span class="skill-badge bg-[#0F0F0F] border border-[#303030] px-4 py-2 rounded-md">GitHub</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificates Section WITH YOUR EXISTING CARD STRUCTURE -->
+        <section id="certificates" class="py-12 lg:py-20 px-6 lg:px-12 bg-[#181818] scroll-animation">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold mb-10">Certificates</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Certificate 1 - Add your actual certificate content here -->
+                    <div class="certificate-card bg-[#0F0F0F] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#181818] flex items-center justify-center gallery-item" data-gallery="certificates" data-index="0">
+                            <!-- Your certificate image -->
+                            <img src="images/cer1.jpg" alt="" class="certificate-img">
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-award text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-lg">Preview Cloud Security and Audit Fundamentals: AWS, Microsoft Azure, and Google Cloud</h3>
+                                        <p class="text-[#AAAAAA] text-sm">Linkedin Learning • 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">Explore CSPM tools such as AWS Security Hub, Microsoft Defender for Cloud, and Google Security Command Center to monitor and improve cloud security.</p>
+                            </div>
+                            <button class="view-certificate-btn w-full bg-[#181818] hover:bg-[#252525] text-white py-2 rounded-lg text-sm" 
+                                    data-gallery="certificates" 
+                                    data-index="0">
+                                View Certificate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Certificate 2 -->
+                    <div class="certificate-card bg-[#0F0F0F] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#181818] flex items-center justify-center gallery-item" data-gallery="certificates" data-index="1">
+                            <img src="images/cer2.jpg" alt="" class="certificate-img">
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-award text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-lg">Creating a Responsive Web Experience</h3>
+                                        <p class="text-[#AAAAAA] text-sm">Linkedin Learning • 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">This course teaches how to build responsive websites that work well on different devices and screen sizes.</p>
+                            </div>
+                            <button class="view-certificate-btn w-full bg-[#181818] hover:bg-[#252525] text-white py-2 rounded-lg text-sm" 
+                                    data-gallery="certificates" 
+                                    data-index="1">
+                                View Certificate
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Certificate 3 -->
+                    <div class="certificate-card bg-[#0F0F0F] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#181818] flex items-center justify-center gallery-item" data-gallery="certificates" data-index="2">
+                            <img src="images/cer3.jpg" alt="" class="certificate-img">
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-award text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-lg">Cybersecurity Awareness: Cybersecurity Terminology</h3>
+                                        <p class="text-[#AAAAAA] text-sm">Linkedin Learning • 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">This course explains basic cybersecurity terminology to help beginners understand common security concepts and threats.</p>
+                            </div>
+                            <button class="view-certificate-btn w-full bg-[#181818] hover:bg-[#252525] text-white py-2 rounded-lg text-sm" 
+                                    data-gallery="certificates" 
+                                    data-index="2">
+                                View Certificate
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Certificate 4 -->
+                    <div class="certificate-card bg-[#0F0F0F] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#181818] flex items-center justify-center gallery-item" data-gallery="certificates" data-index="3">
+                            <img src="images/cer4.jpg" alt="" class="certificate-img">
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-award text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-lg">Web Security: User Authentication and Access Control</h3>
+                                        <p class="text-[#AAAAAA] text-sm">Linkedin Learning • 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">This course introduces the fundamentals of web security, focusing on user authentication and access control to protect web applications.</p>
+                            </div>
+                            <button class="view-certificate-btn w-full bg-[#181818] hover:bg-[#252525] text-white py-2 rounded-lg text-sm" 
+                                    data-gallery="certificates" 
+                                    data-index="3">
+                                View Certificate
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Certificate 5 -->
+                    <div class="certificate-card bg-[#0F0F0F] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#181818] flex items-center justify-center gallery-item" data-gallery="certificates" data-index="4">
+                            <img src="images/cer5.png" alt="" class="certificate-img">
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#181818] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-award text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-lg">Ignite Bootcamp - Venture Idea Development - Philippines</h3>
+                                        <p class="text-[#AAAAAA] text-sm">Wadhwani Foundation • 2025</p>
+                                    </div>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">An entrepreneurship bootcamp focused on venture ideation, prototyping, and business modeling.</p>
+                            </div>
+                            <button class="view-certificate-btn w-full bg-[#181818] hover:bg-[#252525] text-white py-2 rounded-lg text-sm" 
+                                    data-gallery="certificates" 
+                                    data-index="4">
+                                View Certificate
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section WITH YOUR EXISTING CARD STRUCTURE -->
+        <section id="projects" class="py-12 lg:py-20 px-6 lg:px-12 scroll-animation">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-3xl font-bold mb-10">Projects</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Project 1 -->
+                    <div class="project-card bg-[#181818] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#0F0F0F] flex items-center justify-center gallery-item" data-gallery="projects" data-index="0">
+                            <div class="text-center p-4">
+                                <img src="images/p1.png" alt="">
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-laptop-code text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <h3 class="font-medium text-lg">Hotel Management System</h3>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">A Hotel Management System that tracks room details, including room number, room type, and current status, making it easy to manage bookings and availability.</p>
+                                <div class="flex flex-wrap gap-2 mb-5">
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">HTML</span>
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs"> Tailwind CSS</span>
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">JavaScript</span>
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">Laravel</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="view-project-btn flex-1 bg-[#FF0000] hover:bg-[#CC0000] text-white py-2 rounded-lg text-center text-sm" 
+                                        data-gallery="projects" 
+                                        data-index="0">
+                                    View Project
+                                </button>
+                                <a href="https://github.com/CdReyes460/reyes_midterm_project.git" class="bg-[#0F0F0F] hover:bg-[#252525] text-white p-2 rounded-lg">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="project-card bg-[#181818] border border-[#303030] rounded-xl overflow-hidden card-hover flex flex-col">
+                        <div class="h-48 bg-[#0F0F0F] flex items-center justify-center gallery-item" data-gallery="projects1" data-index="0">
+                            <div class="text-center p-4">
+                                <img src="images/gun-3.png" alt="">
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col justify-between flex-grow">
+                            <div>
+                                <div class="flex items-center mb-4">
+                                    <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                        <i class="fas fa-laptop-code text-[#FF0000] text-xl"></i>
+                                    </div>
+                                    <h3 class="font-medium text-lg">Savage Gun</h3>
+                                </div>
+                                <p class="text-[#AAAAAA] text-sm mb-4">Savage Guns is an online shopping website that displays information about firearms, accessories, and related gear.</p>
+                                <div class="flex flex-wrap gap-2 mb-5">
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">HTML</span>
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">Tailwind CSS</span>
+                                    <span class="bg-[#0F0F0F] px-3 py-1 rounded text-xs">JavaScript</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-3">
+                                <button class="view-project-btn flex-1 bg-[#FF0000] hover:bg-[#CC0000] text-white py-2 rounded-lg text-center text-sm" 
+                                        data-gallery="projects1" 
+                                        data-index="0">
+                                    View Project
+                                </button>
+                                <a href="https://github.com/Lao-Mao21/GunDealership.git" class="bg-[#0F0F0F] hover:bg-[#252525] text-white p-2 rounded-lg">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-12 lg:py-20 px-6 lg:px-12 bg-[#181818] scroll-animation">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold mb-10">Contact Me</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- Contact Form -->
+                    <div class="bg-[#0F0F0F] border border-[#303030] rounded-xl p-6">
+                        <h3 class="text-xl font-medium mb-6">Send a Message</h3>
+                        
+                        <form id="contactForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="space-y-5">
+                            <div>
+                                <label for="name" class="block text-[#AAAAAA] mb-2">Name</label>
+                                <input type="text" name="name" id="name" required class="w-full bg-[#181818] border border-[#303030] rounded-lg p-3 focus:outline-none focus:border-[#FF0000] text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="email" class="block text-[#AAAAAA] mb-2">Email</label>
+                                <input type="email" name="email" id="email" required class="w-full bg-[#181818] border border-[#303030] rounded-lg p-3 focus:outline-none focus:border-[#FF0000] text-white">
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-[#AAAAAA] mb-2">Message</label>
+                                <textarea id="message" name="message" rows="4" required class="w-full bg-[#181818] border border-[#303030] rounded-lg p-3 focus:outline-none focus:border-[#FF0000] text-white"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn-press w-full bg-[#FF0000] hover:bg-[#CC0000] text-white font-medium py-3 rounded-lg">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Contact Info & Social -->
+                    <div>
+                        <h3 class="text-xl font-medium mb-6">Get in Touch</h3>
+                        <p class="text-[#AAAAAA] mb-8">
+                            I'm always open to discussing new opportunities, interesting projects, or just having a friendly chat about tech and design.
+                        </p>
+                        
+                        <div class="space-y-4 mb-10">
+                            <div class="flex items-center">
+                                <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                    <i class="fas fa-envelope text-[#FF0000]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-[#AAAAAA]">Email</p>
+                                    <p>creyes@gmail.com</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <div class="bg-[#0F0F0F] p-3 rounded-lg mr-4">
+                                    <i class="fas fa-map-marker-alt text-[#FF0000]"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-[#AAAAAA]">Location</p>
+                                    <p>Roxas City, Philippines</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-medium mb-4">Connect with me</h4>
+                            <div class="flex space-x-4">
+                                <a href="https://github.com/CdReyes460" class="social-icon bg-[#0F0F0F] hover:bg-[#252525] w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="https://www.linkedin.com/in/christian-dave-reyes-416a4a398/" class="social-icon bg-[#0F0F0F] hover:bg-[#252525] w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="https://www.facebook.com/xianchristian.08" class="social-icon bg-[#0F0F0F] hover:bg-[#252525] w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                                    <i class="fab fa-facebook"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="py-8 px-6 lg:px-12 border-t border-[#303030] text-center text-[#AAAAAA]">
+            <p>© 2024 Christian Dave Reyes. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <!-- JavaScript with COMPLETE MODAL SYSTEM (same as your previous portfolio) -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+            const sideNav = document.getElementById('sideNav');
+            sideNav.classList.toggle('translate-x-0');
+        });
+        
+        // Navigation active state
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('section');
+            
+            // Set initial active state
+            setActiveNav();
+            
+            // Update active state on scroll
+            window.addEventListener('scroll', setActiveNav);
+            
+            function setActiveNav() {
+                let currentSection = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                
+                navItems.forEach(item => {
+                    item.classList.remove('bg-[#252525]', 'text-white');
+                    item.classList.add('text-[#AAAAAA]');
+                    
+                    const href = item.getAttribute('href');
+                    if (href === `#${currentSection}`) {
+                        item.classList.remove('text-[#AAAAAA]');
+                        item.classList.add('bg-[#252525]', 'text-white');
+                    }
+                });
+            }
+            
+            // Close mobile menu when clicking a nav item
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const sideNav = document.getElementById('sideNav');
+                    sideNav.classList.remove('translate-x-0');
+                });
+            });
+            
+            // COMPLETE MODAL SYSTEM (Same as your previous portfolio)
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const imageCounter = document.getElementById('imageCounter');
+            const modalClose = document.querySelector('.modal-close');
+            const prevBtn = document.querySelector('.modal-nav.prev');
+            const nextBtn = document.querySelector('.modal-nav.next');
+            
+            // Sample image galleries (REPLACE WITH YOUR ACTUAL IMAGE PATHS)
+            const galleries = {
+                certificates: [
+                    'images/cer1.jpg',
+                    'images/cer2.jpg',
+                    'images/cer3.jpg',
+                    'images/cer4.jpg',
+                    'images/cer5.png'
+                ],
+                projects: [
+                    'images/p1.png',
+                    'images/p2.png',
+                    'images/p3.png',
+                    'images/p4.png'
+                ],
+                projects1: [
+                    'images/gun-1.png',
+                    'images/gun-2.png',
+                    'images/gun-3.png',
+                    'images/gun-4.png',
+                    'images/gun-5.png'
+                ]
+            };
+            
+            let currentGallery = '';
+            let currentIndex = 0;
+            
+            // Function to open modal with specific gallery and index
+            function openModal(galleryName, index) {
+                currentGallery = galleryName;
+                currentIndex = index;
+                modalImage.src = galleries[galleryName][index];
+                imageCounter.textContent = `${index + 1} / ${galleries[galleryName].length}`;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+            }
+            
+            // Function to close modal
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+            
+            // Function to navigate to previous image
+            function prevImage() {
+                if (currentGallery) {
+                    currentIndex = (currentIndex - 1 + galleries[currentGallery].length) % galleries[currentGallery].length;
+                    modalImage.src = galleries[currentGallery][currentIndex];
+                    imageCounter.textContent = `${currentIndex + 1} / ${galleries[currentGallery].length}`;
+                }
+            }
+            
+            // Function to navigate to next image
+            function nextImage() {
+                if (currentGallery) {
+                    currentIndex = (currentIndex + 1) % galleries[currentGallery].length;
+                    modalImage.src = galleries[currentGallery][currentIndex];
+                    imageCounter.textContent = `${currentIndex + 1} / ${galleries[currentGallery].length}`;
+                }
+            }
+            
+            // Event listeners for certificate and project buttons
+            document.querySelectorAll('.view-certificate-btn, .view-project-btn, .gallery-item').forEach(button => {
+                button.addEventListener('click', function() {
+                    const gallery = this.getAttribute('data-gallery');
+                    const index = parseInt(this.getAttribute('data-index'));
+                    openModal(gallery, index);
+                });
+            });
+            
+            // Event listeners for modal controls
+            modalClose.addEventListener('click', closeModal);
+            prevBtn.addEventListener('click', prevImage);
+            nextBtn.addEventListener('click', nextImage);
+            
+            // Close modal when clicking outside the image
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (modal.classList.contains('active')) {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                    } else if (e.key === 'ArrowLeft') {
+                        prevImage();
+                    } else if (e.key === 'ArrowRight') {
+                        nextImage();
+                    }
+                }
+            });
+            
+            // Scroll animations
+            const scrollElements = document.querySelectorAll('.scroll-animation');
+            
+            const elementInView = (el, dividend = 1) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return (
+                    elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+                );
+            };
+            
+            const displayScrollElement = (element) => {
+                element.classList.add('visible');
+            };
+            
+            const hideScrollElement = (element) => {
+                element.classList.remove('visible');
+            };
+            
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if (elementInView(el, 1.25)) {
+                        displayScrollElement(el);
+                    } else {
+                        hideScrollElement(el);
+                    }
+                });
+            };
+            
+            // Initial check
+            handleScrollAnimation();
+            
+            // Listen for scroll
+            window.addEventListener('scroll', () => {
+                handleScrollAnimation();
+            });
+        });
+    </script>
+</body>
+</html>
