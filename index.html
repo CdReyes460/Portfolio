@@ -223,6 +223,16 @@
         </button>
     </div>
 
+    <!-- Success Message Modal -->
+    <div id="successMessage" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#0F0F0F] border border-[#FF0000] rounded-lg p-8 z-50 shadow-lg max-w-sm text-center">
+        <div class="text-4xl text-[#FF0000] mb-4">✓</div>
+        <h4 class="text-xl font-medium mb-2">Message Sent!</h4>
+        <p class="text-[#AAAAAA] mb-6">Thank you for your message. I'll get back to you soon!</p>
+        <button onclick="closeSuccessMessage()" class="bg-[#FF0000] hover:bg-[#CC0000] text-white font-medium py-2 px-6 rounded-lg">
+            Close
+        </button>
+    </div>
+
     <!-- Side Navigation -->
     <nav id="sideNav" class="fixed left-0 top-0 h-full w-64 bg-[#181818] border-r border-[#303030] z-40 transform -translate-x-full lg:translate-x-0 lg:block transition-transform duration-300">
         <div class="p-6">
@@ -691,7 +701,7 @@ I focus on learning the basics of web development, including HTML, CSS, and Java
                     <div class="bg-[#0F0F0F] border border-[#303030] rounded-xl p-6">
                         <h3 class="text-xl font-medium mb-6">Send a Message</h3>
                         
-                        <form id="contactForm" action="https://formspree.io/f/mkogdjko" method="POST" class="space-y-5">
+                        <form id="contactForm" class="space-y-5">
                             <div>
                                 <label for="name" class="block text-[#AAAAAA] mb-2">Name</label>
                                 <input type="text" name="name" id="name" required class="w-full bg-[#181818] border border-[#303030] rounded-lg p-3 focus:outline-none focus:border-[#FF0000] text-white">
@@ -774,6 +784,15 @@ I focus on learning the basics of web development, including HTML, CSS, and Java
             const sideNav = document.getElementById('sideNav');
             sideNav.classList.toggle('translate-x-0');
         });
+        
+        // Global function for closing modal
+        function closeSuccessMessage() {
+            const successMessage = document.getElementById('successMessage');
+            const contactForm = document.getElementById('contactForm');
+            successMessage.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            contactForm.reset();
+        }
         
         // Navigation active state
         document.addEventListener('DOMContentLoaded', function() {
@@ -956,8 +975,43 @@ I focus on learning the basics of web development, including HTML, CSS, and Java
             window.addEventListener('scroll', () => {
                 handleScrollAnimation();
             });
+            
+            // CONTACT FORM HANDLER
+            const contactForm = document.getElementById('contactForm');
+            const successMessage = document.getElementById('successMessage');
+            
+            function showSuccessMessage() {
+                successMessage.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            contactForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = new FormData(contactForm);
+                
+                try {
+                    // Send to Formspree
+                    const response = await fetch('https://formspree.io/f/mjgknyla', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        showSuccessMessage();
+                    } else {
+                        alert('There was an error sending your message. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('There was an error sending your message. Please try again.');
+                }
+            });
         });
     </script>
 </body>
-
 </html>
